@@ -1,10 +1,10 @@
 ---
 galaxy_info:
-  author: "Fauzi Gomez"
+  author: "Jerker Montelius"
   description: "An Ansible playbook to automate the installation of Atlassian Jira, could posibly be used to keep it updated"
-  documentation_url: https://github.com/fauzigo/ansible-jira/blob/master/README.md
-  license: BSD
-  min_ansible_version: 1.4
+  documentation_url: https://github.com/jermon/ansible-jira/blob/master/README.md
+  license: GPL
+  min_ansible_version: 1.6
   platforms:
     - name: EL
       versions:

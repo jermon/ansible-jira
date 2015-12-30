@@ -7,3 +7,6 @@
   yum: name={{ item }} state=installed
   with_items:
    - java-1.7.0-openjdk-devel
+   - lsb
+- name: Update facts
+  action: setup 

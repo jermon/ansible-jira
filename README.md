@@ -55,7 +55,7 @@ source ./hacking/env-setup
 
 ## 4. Usage
 
-1. `git clone http://github.com/fauzigo/ansible-jira` or `ansible-galaxy install fauzigo.jira`
+1. `git clone http://github.com/jermon/ansible-jira` or `ansible-galaxy install jermon.jira`
 2. create a vars file in you group_vars dir or host_vars or simply add them directory on your main yml file
 3. run the Ansible playbook, the fastest way is:
 
@@ -66,21 +66,19 @@ ansible-playbook jira.yml --extra-vars=/path/to/file_var
 ### 4.1 Playbook Arguments
 
 - jira_user_group: group that jira files are going to belong to
-- jira_user_group_gid: group id 
 - jira_user: user that jira files are going to belong to
-- jira_user_uid: user id
 - jira_user_home_dir: path to where the sources are going to be, Default: /opt
 - jira_home: jira-home path, if it's the first time installation use whereever you like, otherwise use your current
 - jira_version: the version check latest in atlassian site
-- jira_version_file_sha256sum: you should have this 
 - jira_download_link: link to download the .tar.gz file (note: it will be concatenated with the version var)
-
-**TODO**: make gid, uid and sha256sum optional
+- jira_java_home: path to the jvm in to use.
 
 Example:
 
 ```
-ansible-playbook jira.yml --extra-vars 'jira_user_group=jira jira_user_group_gid=1000 jira_user=jira jira_user_uid=1000 jira_user_home_dir=/opt jira_home=/var/jira jira_download_link="http://www.atlassian.com/software/jira/downloads/binary/atlassian-jira" jira_version=6.3.9 jira_version_file_sha256sum=5ba3496347d78383e0201a80ecd0bafa9b6a2ea1e4841f4d843c1369d21da9a9'
+  roles:
+    - ansible-jira
+    
 ```
 
 **TODO** use the handler after install to run the application

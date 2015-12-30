@@ -3,7 +3,7 @@
 ## 1. QuickStart
 
 ```
-ansible-galaxy install fauzigo.jira
+ansible-galaxy install jermon.jira
 # Deploy to a remote
 ansible-playbook jira.yml --extra-vars=/path/to/file_vars
 

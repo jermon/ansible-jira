@@ -59,9 +59,46 @@
     dest: /etc/init.d/jira
   when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
   
+- name: Remove .exe and .bat files from linux install
+  file:
+    path: "{{ jira_user_home_dir }}/jira/bin/{{ item }}" 
+    state: absent
+  with_items:
+    - catalina.bat    
+    - permgen.bat         
+    - setenv.bat      
+    - stop-jira.bat
+    - config.bat      
+    - permgenservice.bat  
+    - shutdown.bat    
+    - tool-wrapper.bat
+    - configtest.bat  
+    - service.bat         
+    - start-jira.bat  
+    - version.bat
+    - digest.bat
+    - setclasspath.bat    
+    - startup.bat
+    - tomcat7.exe
+    - tomcat7.exe.x64
+    - tomcat7w.exe
+
+- name: Remove licenses dir
+  file:
+    path: "{{ jira_user_home_dir }}/jira/licenses" 
+    state: absent
+
+- name: chown and touch files
+  file:
+    path: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
+    state: absent
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_user_group }}" 
+    recurse: yes
+    state: directory
+
 - name: Start the jira service
   service:
     name: jira
     state: started
     enabled: yes
-  

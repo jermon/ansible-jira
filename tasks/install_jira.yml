@@ -91,7 +91,6 @@
 - name: chown and touch files
   file:
     path: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
-    state: absent
     owner: "{{ jira_user }}" 
     group: "{{ jira_user_group }}" 
     recurse: yes

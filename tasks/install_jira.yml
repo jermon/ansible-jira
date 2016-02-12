@@ -10,14 +10,9 @@
     group: "{{ jira_user_group }}" 
     home: "{{ jira_user_home_dir }}"
 
-- name: Download the Source
-  get_url: 
-    url: "{{ jira_download_link }}-{{ jira_version }}.tar.gz"
-    dest: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}.tar.gz"
-
 - name: Extrat the sources
   unarchive: 
-    src: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}.tar.gz" 
+    src: "{{ jira_download_link }}-{{ jira_version }}.tar.gz" 
     dest: "{{ jira_user_home_dir }}"
     copy: no
     creates: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone"

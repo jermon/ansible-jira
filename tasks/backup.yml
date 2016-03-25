@@ -1,0 +1,39 @@
+- name: Stop the jira service
+  service:
+    name: jira
+    state: stopped
+  become: yes
+  
+- name: Tar install dir
+  command: tar czf /tmp/jira_install_backup.tgz "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone"   
+  become: yes
+  
+- name: Tar home dir
+  command: tar czf /tmp/jira_home_backup.tgz "{{ jira_home }}" 
+  become: yes
+  
+- name: pg_dump DB
+  command: pg_dump -f /tmp/jira_db_backup.tar -F t -d {{ jiradb }} -U postgres
+  
+- name: Create backupdir
+  file: 
+    path: backup 
+    state: directory 
+    mode: 0755
+  become: no
+  delegate_to: 127.0.0.1
+
+- name: fetchbackup files
+  fetch:
+    src: "{{item}}"
+    dest: backup/
+  with_items:
+    - /tmp/jira_install_backup.tgz
+    - /tmp/jira_home_backup.tgz
+    - /tmp/jira_db_backup.tar
+    
+- name: Start the jira service
+  service:
+    name: jira
+    state: started
+  become: yes

@@ -1,0 +1,91 @@
+- name: Jira groups
+  group: 
+    name: "{{ jira_user_group }}" 
+  become: yes
+
+- name: Default JIRA user and home
+  user: 
+    name: "{{ jira_user }}" 
+    shell: /bin/bash 
+    group: "{{ jira_user_group }}" 
+    home: "{{ jira_user_home_dir }}"
+  become: yes
+
+#- name: Stop the jira service
+#  service:
+#    name: jira
+#    state: stopped
+#  become: yes
+
+- name: Restore jira install
+  unarchive: 
+    src: ../backup/default/tmp/jira_install_backup.tgz
+    dest: /
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_user_group }}"     
+  become: yes
+
+- name: Make the directory easier to reach
+  file: 
+    src: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
+    dest: "{{ jira_user_home_dir }}/jira" 
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_user_group }}" 
+    state: link
+  become: yes
+
+- name: Create jira-home dir
+  file: 
+    path: "{{ jira_home }}" 
+    state: directory 
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_user_group }}" 
+  become: yes
+
+- name: Restore jira home
+  unarchive: 
+    src: ../backup/default/tmp/jira_home_backup.tgz
+    dest: /
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_user_group }}"     
+  become: yes
+
+- name: Copy the service script
+  template: 
+    src: jira.service.j2 
+    dest: /usr/lib/systemd/system/jira.service
+#  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
+  become: yes
+
+#- name: Copy the init.d script
+#  template: 
+#    src: jira.j2
+#    dest: /etc/init.d/jira
+#  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+#  become: yes
+  
+- name: Copy DB
+  copy:
+    src: ../backup/default/tmp/jira_db_backup.tar
+    dest: /tmp/jira_db_backup.tar
+    owner: vagrant 
+    group: vagrant
+    mode: 0644
+
+#- name: Remove DB
+#  postgresql_db: 
+#    name: "{{ jiradb }}"
+#    state: absent
+    
+#- name: Create DB
+#  postgresql_db: 
+#    name: "{{ jiradb }}"
+    
+- name: Restore jira DB
+  command: pg_restore -i -h {{ dbserver }} -p {{ dbport }} -U postgres -d {{ jiradb }} /tmp/jira_db_backup.tar
+      
+- name: Start the jira service
+  service:
+    name: jira
+    state: started
+  become: yes

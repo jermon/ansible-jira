@@ -52,6 +52,9 @@
   template: 
     src: jira.j2
     dest: /etc/init.d/jira
+    owner: root
+    group: root
+    mode: 0755
   when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
   
 - name: Remove .exe and .bat files from linux install

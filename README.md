@@ -23,7 +23,7 @@ ansible-playbook jira.yml --extra-vars=/path/to/file_vars
 ## 2. Overview
 
 An Ansible playbook to automate the installation of Atlassian Jira, could posibly be used to keep it updated
-
+As an e
 The Task performed by the playbook are:
 
 	- install or check if java-1.7.0-openjdk-devel is installed
@@ -72,12 +72,16 @@ ansible-playbook jira.yml --extra-vars=/path/to/file_var
 - jira_version: the version check latest in atlassian site
 - jira_download_link: link to download the .tar.gz file (note: it will be concatenated with the version var)
 - jira_java_home: path to the jvm in to use.
+- jira_action: One of install, backup or restore. Defaults to install.
 
 Example:
 
+One of 
 ```
   roles:
     - ansible-jira
+    - { role: ansible-jira, jira_action: "backup" }
+    - { role: ansible-jira, jira_action: "restore" }
     
 ```
 

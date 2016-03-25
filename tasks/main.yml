@@ -1,4 +1,11 @@
 
 - include: install_dependencies.yml
+  when: jira_action == "install"
 - include: install_jira.yml
+  when: jira_action == "install"
 
+- include: backup.yml
+  when: jira_action == "backup"
+
+- include: restore.yml
+  when: jira_action == "restore"

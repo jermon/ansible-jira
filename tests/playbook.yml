@@ -1,4 +1,4 @@
 ---
-- hosts: testserver
+- hosts: all
   roles:
    - ansible-jira

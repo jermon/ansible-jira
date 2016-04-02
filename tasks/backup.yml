@@ -1,20 +1,33 @@
-- name: Stop the jira service
-  service:
-    name: jira
-    state: stopped
+
+- name: Stop jira
+  command: "{{ jira_install_dir }}/bin/stop-jira.sh"   
   become: yes
-  
+
 - name: Tar install dir
-  command: tar czf /tmp/jira_install_backup.tgz "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone"   
+  command: tar czf /tmp/jira_install_backup.tgz "{{ jira_install_dir }}"
+  args:
+    creates: /tmp/jira_install_backup.tgz
   become: yes
-  
+
 - name: Tar home dir
   command: tar czf /tmp/jira_home_backup.tgz "{{ jira_home }}" 
+  args:
+    creates: /tmp/jira_home_backup.tgz
   become: yes
+
   
 - name: pg_dump DB
   command: pg_dump -f /tmp/jira_db_backup.tar -F t -d {{ jiradb }} -U postgres
-  
+  args:
+    creates: /tmp/jira_db_backup.tar
+  become: yes
+  become_user: postgres
+
+    
+- name: Start jira
+  command: "{{ jira_install_dir }}/bin/start-jira.sh"   
+  become: yes
+
 - name: Create backupdir
   file: 
     path: backup 
@@ -32,8 +45,3 @@
     - /tmp/jira_home_backup.tgz
     - /tmp/jira_db_backup.tar
     
-- name: Start the jira service
-  service:
-    name: jira
-    state: started
-  become: yes

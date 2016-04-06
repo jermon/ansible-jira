@@ -1,14 +1,22 @@
 - name: Jira groups
   group: 
-    name: "{{ jira_user_group }}" 
+    name: "{{ jira_group }}" 
+  become: yes
+
+- name: Create jira-home dir
+  file: 
+    path: "{{ jira_home }}" 
+    state: directory 
+    owner: "{{ jira_user }}" 
+    group: "{{ jira_group }}" 
   become: yes
 
 - name: Default JIRA user and home
   user: 
     name: "{{ jira_user }}" 
     shell: /bin/bash 
-    group: "{{ jira_user_group }}" 
-    home: "{{ jira_user_home_dir }}"
+    group: "{{ jira_group }}" 
+    home: "{{ jira_home }}"
   become: yes
 
 #- name: Stop the jira service
@@ -22,32 +30,24 @@
     src: ../backup/default/tmp/jira_install_backup.tgz
     dest: /
     owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}"     
+    group: "{{ jira_group }}"     
   become: yes
 
-- name: Make the directory easier to reach
-  file: 
-    src: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
-    dest: "{{ jira_user_home_dir }}/jira" 
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
-    state: link
-  become: yes
-
-- name: Create jira-home dir
-  file: 
-    path: "{{ jira_home }}" 
-    state: directory 
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
-  become: yes
+#- name: Make the directory easier to reach
+#  file: 
+#    src: "{{ jira_home }}/atlassian-jira-{{ jira_version }}-standalone" 
+#    dest: "{{ jira_home }}/jira" 
+#    owner: "{{ jira_user }}" 
+#    group: "{{ jira_group }}" 
+#    state: link
+#  become: yes
 
 - name: Restore jira home
   unarchive: 
     src: ../backup/default/tmp/jira_home_backup.tgz
     dest: /
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}"     
+    owner: "{{ jira_user }}"
+    group: "{{ jira_group }}"
   become: yes
 
 - name: Copy the service script

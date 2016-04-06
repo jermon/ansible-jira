@@ -1,10 +1,23 @@
 ---
 jira_user_group: jira
+
+jira_rmi: 8005
+jira_home: /var/atlassian/application-data/jira
+jira_install: /opt/atlassian/jira
+jira_http_port: 8080
+jira_type: core
+jira_version: 7.1.2
+jira_arc: x64
+jira_exec: atlassian-jira-{{ jira_type }}-{{ jira_version }}-{{ jira_arc }}.bin
+jira_download_url: https://www.atlassian.com/software/jira/downloads/binary/{{ jira_exec }}
+
+pglHost: localhost
+pgPort:  5432
+pgDatabase: jiradb
+pgUser: jiradbuser
+pgPass: pass
+
 jira_user: jira 
-jira_home: /var/jira 
-jira_user_home_dir: /opt 
-jira_install_dir: /opt/atlassian/jira
-jira_download_link: "http://www.atlassian.com/software/jira/downloads/binary/atlassian-jira" 
-jira_version: 6.3.9 
-jira_java_home: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.91-2.6.2.3.el7.x86_64
+jira_group: jira
+
 jira_action: install

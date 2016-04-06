@@ -6,7 +6,26 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.hostname = "Jira"
+
+    config.vm.define "master" do |master|
+        master.vm.hostname = "Jira1"
+        master.vm.network "private_network", ip: "192.168.33.10"
+        master.vm.provision "ansible" do |ansible|
+            ansible.sudo = true
+            ansible.playbook = "tests/playbook.yml"
+        end
+    end
+
+    config.vm.define "slave" do |slave|
+        slave.vm.hostname = "Jira2"
+        slave.vm.network "private_network", ip: "192.168.33.11"
+        slave.vm.provision "ansible" do |ansible|
+            ansible.sudo = true
+            ansible.playbook = "tests/playbook1.yml"
+        end
+  end
+    
+  # config.vm.hostname = "Jira"
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
@@ -28,7 +47,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.10"
+  # config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -45,13 +64,16 @@ Vagrant.configure(2) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
   #   vb.memory = "1024"
   # end
+      vb.memory = "2048"
+      vb.cpus = 2
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -70,9 +92,9 @@ Vagrant.configure(2) do |config|
   #   sudo apt-get install apache2
   # SHELL
 
-  config.vm.provision "ansible" do |ansible|
-	  ansible.sudo = true
-    ansible.playbook = "tests/playbook.yml"
-#   ansible.verbose = 'v'
-  end
+  # config.vm.provision "ansible" do |ansible|
+	# ansible.sudo = true
+    # ansible.playbook = "tests/playbook.yml"
+    # ansible.verbose = 'v'
+  # end
 end

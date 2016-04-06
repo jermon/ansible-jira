@@ -1,10 +1,10 @@
 
 - name: Stop jira
-  command: "{{ jira_install_dir }}/bin/stop-jira.sh"   
+  command: "{{ jira_install }}/bin/stop-jira.sh"   
   become: yes
 
 - name: Tar install dir
-  command: tar czf /tmp/jira_install_backup.tgz "{{ jira_install_dir }}"
+  command: tar czf /tmp/jira_install_backup.tgz "{{ jira_install }}"
   args:
     creates: /tmp/jira_install_backup.tgz
   become: yes
@@ -15,33 +15,24 @@
     creates: /tmp/jira_home_backup.tgz
   become: yes
 
-  
 - name: pg_dump DB
-  command: pg_dump -f /tmp/jira_db_backup.tar -F t -d {{ jiradb }} -U postgres
+  command: pg_dump -f /tmp/jira_db_backup.tar -F t -d {{ pgDatabase }} -U postgres
   args:
     creates: /tmp/jira_db_backup.tar
   become: yes
   become_user: postgres
-
     
 - name: Start jira
-  command: "{{ jira_install_dir }}/bin/start-jira.sh"   
+  command: "{{ jira_install }}/bin/start-jira.sh"   
   become: yes
 
-- name: Create backupdir
-  file: 
-    path: backup 
-    state: directory 
-    mode: 0755
-  become: no
-  delegate_to: 127.0.0.1
-
-- name: fetchbackup files
+- name: Fetch backup files.
   fetch:
-    src: "{{item}}"
-    dest: backup/
+    src: "/tmp/{{item}}"
+    dest: ../backup
+    fail_on_missing: yes
   with_items:
-    - /tmp/jira_install_backup.tgz
-    - /tmp/jira_home_backup.tgz
-    - /tmp/jira_db_backup.tar
+    - jira_install_backup.tgz
+    - jira_home_backup.tgz
+    - jira_db_backup.tar
     

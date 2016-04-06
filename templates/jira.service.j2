@@ -5,10 +5,10 @@ After=syslog.target network.target
 [Service]
 Type=forking
 User={{ jira_user }}
-Group={{ jira_user_group }}
-Environment=JAVA_HOME={{ jira_java_home }}
-ExecStart={{ jira_user_home_dir }}/jira//bin/start-jira.sh
-ExecStop={{ jira_user_home_dir }}/jira/bin/stop-jira.sh
+Group={{ jira_group }}
+Environment=JAVA_HOME={{ jira_install }}/jre
+ExecStart={{ jira_install }}/jira/bin/start-jira.sh
+ExecStop={{ jira_install }}/jira/bin/stop-jira.sh
    
 [Install]
 WantedBy=multi-user.target

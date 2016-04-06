@@ -1,65 +1,67 @@
 ---
-- name: Jira groups
-  group: 
-    name: "{{ jira_user_group }}" 
 
-- name: Default JIRA user and home
-  user: 
-    name: "{{ jira_user }}" 
-    shell: /bin/bash 
-    group: "{{ jira_user_group }}" 
-    home: "{{ jira_user_home_dir }}"
-
-- name: Extrat the sources
-  unarchive: 
-    src: "{{ jira_download_link }}-{{ jira_version }}.tar.gz" 
-    dest: "{{ jira_user_home_dir }}"
-    copy: no
-    creates: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone"
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}"     
-
-- name: Make the directory easier to reach
-  file: 
-    src: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
-    dest: "{{ jira_user_home_dir }}/jira" 
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
-    state: link
-
-- name: Create jira-home dir
-  file: 
-    path: "{{ jira_home }}" 
-    state: directory 
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
-
-- name: Set the home dir inside the configs
-  template: 
-    src: jira-application.properties.j2 
-    dest: "{{ jira_user_home_dir }}/jira/atlassian-jira/WEB-INF/classes/jira-application.properties"
-    owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
-    mode: 0644
-
-- name: Copy the service script
-  template: 
-    src: jira.service.j2 
-    dest: /usr/lib/systemd/system/jira.service
-  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
-
-- name: Copy the init.d script
-  template: 
-    src: jira.j2
-    dest: /etc/init.d/jira
+- name: Download Exec Jira
+  get_url: 
+    url: "{{ jira_download_url }}"
+    dest: /tmp/{{ jira_exec }}
     owner: root
     group: root
-    mode: 0755
-  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+    mode: 0777  
+  become: yes
+ 
+- name: Copy Jira Template
+  template: 
+    src: response.varfile.j2
+    dest: /tmp/response.varfile
+ 
+- name: Install Jira
+  command: /tmp/{{ jira_exec }} -q -varfile /tmp/response.varfile
+  args:
+    creates: "{{ jira_home }}"
+  become: yes
+
+- name: Dependencies for JIRA
+  yum: name={{ item }} state=installed
+  with_items:
+   - lsb
+   
+#- name: Copy the service script
+#  template: 
+#    src: jira.service.j2 
+#    dest: /usr/lib/systemd/system/jira.service
+#  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
+#  become: yes
   
+#- name: Remove the init.d script
+#  file:
+#    path: /etc/init.d/jira
+#    state: absent
+#  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
+#  become: yes
+  
+#- name: Copy the init.d script
+#  template: 
+#    src: jira.j2
+#    dest: /etc/init.d/jira
+#    owner: root
+#    group: root
+#    mode: 0755
+#  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+#  sudo: yes
+
+- name: Copy Jira dbconfig File
+  template: 
+    src: dbconfig_pg.xml.j2
+    dest: "{{ jira_home }}/dbconfig.xml"
+    owner: "{{jira_user}}"
+    group: "{{jira_group}}"
+    mode: 0664
+  become: yes
+
+
 - name: Remove .exe and .bat files from linux install
   file:
-    path: "{{ jira_user_home_dir }}/jira/bin/{{ item }}" 
+    path: "{{ jira_install }}/jira/bin/{{ item }}" 
     state: absent
   with_items:
     - catalina.bat    
@@ -83,19 +85,28 @@
 
 - name: Remove licenses dir
   file:
-    path: "{{ jira_user_home_dir }}/jira/licenses" 
+    path: "{{ jira_install }}/licenses" 
     state: absent
 
 - name: chown and touch files
   file:
-    path: "{{ jira_user_home_dir }}/atlassian-jira-{{ jira_version }}-standalone" 
+    path: "{{ jira_install }}" 
     owner: "{{ jira_user }}" 
-    group: "{{ jira_user_group }}" 
+    group: "{{ jira_group }}" 
     recurse: yes
     state: directory
+    
+- name: Stop jira
+  command: "{{ jira_install }}/bin/stop-jira.sh"
+  args:
+    removes: "{{ jira_install }}/work/catalina.pid"
+  become: yes
+   
+- name: Start jira
+  command: "{{ jira_install }}/bin/start-jira.sh"
+  args:
+    chdir: "{{ jira_install }}"
+    creates: "{{ jira_install }}/work/catalina.pid" 
+  become: yes
+    
 
-- name: Start the jira service
-  service:
-    name: jira
-    state: started
-    enabled: yes

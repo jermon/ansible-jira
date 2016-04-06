@@ -1,6 +1,7 @@
 
-- include: install_dependencies.yml
-  when: jira_action == "install"
+#- include: install_dependencies.yml
+#  when: jira_action == "install"
+  
 - include: install_jira.yml
   when: jira_action == "install"
 

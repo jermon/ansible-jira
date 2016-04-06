@@ -1,6 +1,10 @@
 ---
 - hosts: all
   vars:
+    dbserver: localhost
+    dbport: 5432
+    jiradb: jiradb
+    
     postgresql_users:
       - name: "jiradbuser"
         pass: "pass"
@@ -22,8 +26,7 @@
 
   roles:
    - postgresql
-   - ansible-jira
-   - { role: ansible-jira, jira_action: "backup" }
+   - { role: ansible-jira, jira_action: "restore" }
    
   tasks:
   - name: DONE!

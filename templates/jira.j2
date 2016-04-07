@@ -7,14 +7,14 @@
 RUN_AS={{ jira_user }}
 
 # JIRA Linux service controller script
-JIRA_HOME={{ jira_user_home_dir }}/jira/bin
+JIRA_BIN={{ jira_install }}/bin
 
 jiractl() {
         op=$1
         if [ "x$USER" != "x$RUN_AS" ]; then
-                su - "$RUN_AS" -c "cd $JIRA_HOME; ./${op}-jira.sh"
+                su - "$RUN_AS" -c "cd $JIRA_BIN; ./${op}-jira.sh"
         else
-                cd $JIRA_HOME
+                cd $JIRA_BIN
                 ./${op}-jira.sh
         fi
 }

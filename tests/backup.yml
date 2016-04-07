@@ -1,0 +1,25 @@
+---
+- hosts: all
+  vars:
+    postgresql_users:
+      - name: "jiradbuser"
+        pass: "pass"
+
+    postgresql_user_privileges:
+      - name: "jiradbuser"
+        db:   "jiradb"
+        priv: "ALL"
+
+    postgresql_databases:
+      - name:  "jiradb"
+        owner: "jiradbuser"
+
+  pre_tasks:
+
+  roles:
+   - { role: ansible-jira, jira_action: "backup" }
+
+  tasks:
+  - name: DONE!
+    debug:
+      msg: Jira now backuped.

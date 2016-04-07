@@ -7,14 +7,14 @@
 # you're doing.
 Vagrant.configure(2) do |config|
 
-    config.vm.define "master" do |master|
-        master.vm.hostname = "Jira1"
-        master.vm.network "private_network", ip: "192.168.33.10"
-        master.vm.provision "ansible" do |ansible|
-            ansible.sudo = true
-            ansible.playbook = "tests/playbook.yml"
-        end
-    end
+#    config.vm.define "master" do |master|
+#        master.vm.hostname = "Jira1"
+#        master.vm.network "private_network", ip: "192.168.33.10"
+#        master.vm.provision "ansible" do |ansible|
+#            ansible.sudo = true
+#            ansible.playbook = "tests/playbook.yml"
+#        end
+#    end
 
     config.vm.define "slave" do |slave|
         slave.vm.hostname = "Jira2"
@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
             ansible.sudo = true
             ansible.playbook = "tests/playbook1.yml"
         end
-  end
+    end
     
   # config.vm.hostname = "Jira"
   # The most common configuration options are documented and commented below.

@@ -1,0 +1,29 @@
+
+- name: Dependencies for JIRA
+  yum: name={{ item }} state=installed
+  with_items:
+   - lsb
+
+- name: Copy the service script
+  template:
+    src: jira.service.j2
+    dest: /usr/lib/systemd/system/jira.service
+  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
+  become: yes
+
+- name: Remove the init.d script
+  file:
+    path: /etc/init.d/jira
+    state: absent
+  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 7
+  become: yes
+
+- name: Copy the init.d script
+  template:
+    src: jira.j2
+    dest: /etc/init.d/jira
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_os_family == "RedHat" and ansible_lsb.major_release|int == 6
+  become: yes
